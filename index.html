@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Turtle Hug</title>
+    <style>
+        :root { --lake-top: #4fc3f7; --lake-deep: #002633; }
+        body { margin: 0; background: var(--lake-deep); font-family: sans-serif; overflow: hidden; touch-action: manipulation; user-select: none; color: #2e7d32; }
+        #lake { width: 100vw; height: 100vh; background: radial-gradient(circle at 50% 30%, var(--lake-top) 0%, var(--lake-deep) 100%); position: relative; overflow: hidden; }
+        #game-ui { position: absolute; top: 20px; width: 100%; display: flex; justify-content: space-around; color: white; font-size: 28px; text-shadow: 2px 2px 0px rgba(0,0,0,0.3); z-index: 100; pointer-events: none; }
+        #title-screen, #game-over { position: fixed; inset: 0; background: linear-gradient(to bottom, #f0faff, #c2e9fb); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 200; }
+        #game-over { display: none; z-index: 250; text-align: center; }
+        h1 { font-size: 45px; color: #2e7d32; margin-bottom: 20px; text-align: center; }
+        .btn-ui { padding: 15px 40px; font-size: 24px; background: #ff8a80; border: 4px solid #ff5252; border-radius: 40px; color: white; cursor: pointer; font-weight: bold; box-shadow: 0 6px 0 #d32f2f; }
+        .turtle-mover { position: absolute; width: 180px; height: 130px; z-index: 10; }
+        .turtle-hinge { width: 100%; height: 100%; transform-origin: center; animation: pop 0.5s forwards; }
+        .flipper { position: absolute; width: 70px; height: 30px; background-color: inherit; filter: brightness(0.8); top: 20px; transition: 0.3s; }
+        .flipper.left { left: 5px; border-radius: 80% 20% 80% 40%; transform: rotate(-5deg); }
+        .flipper.right { right: 5px; border-radius: 20% 80% 40% 80%; transform: rotate(5deg); }
+        .hugging .flipper.left { transform: rotate(-160deg); }
+        .hugging .flipper.right { transform: rotate(160deg); }
+        .head-shape { width: 65px; height: 45px; background-color: inherit; border-radius: 50%; position: absolute; top: 0; left: 58px; z-index: 5; }
+        .eye { position: absolute; top: 12px; right: 15px; width: 8px; height: 8px; background: #000; border-radius: 50%; }
+        .green-t { background-color: #66bb6a; }
+        .gold-t { background: #ffd700; box-shadow: 0 0 20px gold; }
+        @keyframes pop { 0% { transform: scale(0); } 100% { transform: scale(1); } }
+        .ripple { position: absolute; border: 2px solid white; border-radius: 50%; transform: translate(-50%,-50%); animation: rip 1s forwards; opacity: 0.5; }
+        @keyframes rip { 0% { width: 0; height: 0; } 100% { width: 200px; height: 200px; opacity: 0; } }
+    </style>
+</head>
+<body>
+    <div id="lake">
+        <div id="title-screen"><h1>TURTLE HUG</h1><button class="btn-ui" onclick="startGame()">START</button></div>
+        <div id="game-over"><h1>GAME OVER</h1><h2 id="fs">0</h2><button class="btn-ui" onclick="location.reload()">PLAY AGAIN</button></div>
+        <div id="game-ui"><div>HUGS: <span id="s">0</span></div><div>TIME: <span id="t">60</span></div></div>
+    </div>
+    <script>
+        let score = 0, time = 60, active = false;
+        function startGame() {
+            document.getElementById('title-screen').style.display = 'none';
+            active = true;
+            let timer = setInterval(() => {
+                time--; document.getElementById('t').innerText = time;
+                if(time <= 0) { active = false; clearInterval(timer); document.getElementById('game-over').style.display='flex'; document.getElementById('fs').innerText="Score: "+score; }
+            }, 1000);
+            spawn();
+        }
+        function spawn() {
+            if(!active) return;
+            const x = Math.random()*(window.innerWidth-100)+50, y = Math.random()*(window.innerHeight-150)+75;
+            const t = document.createElement('div'); t.className = 'turtle-mover green-t';
+            if(Math.random()>0.9) t.className = 'turtle-mover gold-t';
+            t.style.left = (x-90)+'px'; t.style.top = (y-65)+'px';
+            t.innerHTML = `<div class="turtle-hinge"><div class="flipper left"></div><div class="flipper right"></div><div class="head-shape"><div class="eye"></div></div></div>`;
+            t.onclick = () => { if(t.classList.contains('hugging')) return; t.classList.add('hugging'); score += (t.classList.contains('gold-t')?10:1); document.getElementById('s').innerText=score; setTimeout(()=>t.remove(), 500); };
+            document.getElementById('lake').appendChild(t);
+            setTimeout(() => { if(t.parentNode) t.remove(); }, 2000);
+            setTimeout(spawn, 1000);
+        }
+    </script>
+</body>
+</html>

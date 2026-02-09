@@ -1,0 +1,16 @@
+{
+  "name": "Turtle Hug",
+  "short_name": "TurtleHug",
+  "start_url": "index.html",
+  "display": "standalone",
+  "background_color": "#002633",
+  "theme_color": "#4fc3f7",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "icon.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
